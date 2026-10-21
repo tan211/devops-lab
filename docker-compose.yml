@@ -10,6 +10,7 @@ services:
       - laravel_network
     depends_on:
       - psgl
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
 
   psgl:
     image: postgres:16-alpine
@@ -37,6 +38,19 @@ services:
       - laravel_network
     depends_on:
       - app
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: ./docker/frontend/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - laravel_network
+    ports:
+      - 5173:5173
 
 networks:
   laravel_network:
